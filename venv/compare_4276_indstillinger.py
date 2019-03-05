@@ -2,22 +2,6 @@ import pandas as pd
 import math
 import os
 import xlsxwriter
-"""
-script ide:
-
-load fil hvor svar gemmes:
-
-Første side har variabel oversigt. Loop gennem disse.
-    For hver:
-	    Gå til sheet i excel:
-	    #Variabelnavn A5. dvs første variabelnavn er  i A6:
-		    Loop ned gennem variabelnavne:
-			    Loop gennem årene:
-                For hver: Gem register + variabelnavn + år + newline
-                #blanke år har ”.”
-                #DREAM (variabelnavn) virker anderledes
-
-"""
 
 
 #make sure path is to most recent version!!
@@ -141,7 +125,7 @@ def create_var_list(reg,list_load_path,save_path):
     file_4276 = open(list_load_path + "out_allsheets.txt", "r")
 
     temp = open(list_load_path + "temp.txt","w")
-    for line in file_4276:
+    for line in file_dst:
         if line.startswith(reg):
             temp.write(line)
     temp.close()
@@ -151,6 +135,22 @@ def create_var_list(reg,list_load_path,save_path):
         for line in file_match:
             file_out.write(line)
     file_out.close()
+
+    # open register from DST
+
+    #recolor according to result
+
+    #create list of var names and years from excel file
+
+    #loop through result and get index in the lists of each var and year. recolor that field.
+
+    #save register
+
+
+    #which input should the script take: format: reg: var(year-year), var(year-year)... \n reg: var...
+
+
+
 
 
     k = True
