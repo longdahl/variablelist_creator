@@ -2,16 +2,23 @@ import pandas as pd
 import math
 import os
 import xlsxwriter
-
+import numpy as np
+import pickle
 
 #make sure path is to most recent version!!
 
 
-save_path = 'C:\\Users\\mikkel-bj\\Desktop\\datamanager\\script\\'
-load_path = 'C:\\Users\\mikkel-bj\\Desktop\\datamanager\\sharepoint_backup\\704276_Opdateringsoversigt30082018_newname.xlsx'
-dst_load_path = "C:\\Users\\mikkel-bj\\Desktop\\datamanager\\script\\from_dst\\"
-list_load_path = "C:\\Users\\mikkel-bj\\Desktop\\datamanager\\script\\"
+arbejde = 0
 
+if arbejde == 1:
+    save_path = 'C:\\Users\\mikkel-bj\\Desktop\\datamanager\\script\\variable_lists\\'
+    load_path = 'C:\\Users\\mikkel-bj\\Desktop\\datamanager\\sharepoint_backup\\704276_Opdateringsoversigt30082018_newname.xlsx'
+    dst_load_path = "C:\\Users\\mikkel-bj\\Desktop\\datamanager\\script\\from_dst\\"
+    list_load_path = "C:\\Users\\mikkel-bj\\Desktop\\datamanager\\script\\"
+else:
+    save_path = "C:\\Users\\Mikkel\Desktop\\arbejde\\Project database\\datamanager\\script\\variable_lists\\"
+    dst_load_path = "C:\\Users\\Mikkel\Desktop\\arbejde\\Project database\\datamanager\\script\\from_dst\\"
+    list_load_path = "C:\\Users\\Mikkel\Desktop\\arbejde\\Project database\\datamanager\\script\\"
 def create_register_list(save_path,load_path):
     path_4276 = load_path
     dict_4276 = pd.read_excel(path_4276,None)
@@ -103,69 +110,107 @@ def renamer(load_path):
 def dst_list_creator(load_path,save_path):
     f = open(save_path + "dst_out.txt", "w+")
     for file in os.listdir(load_path):
+
         excel = pd.read_excel(load_path+file)
+
+        #temp = pickle.loads(pickle.dumps(excel.iloc[2,3::])) hacky deep copy
+
+
+        excel.to_excel(load_path + file)
         reg = file[0:-5]
         print(reg)
-        for k in range(3,excel.shape[0]):
+        for k in range(2,excel.shape[0]):
+            #print(k)
             var = excel.iloc[k,1]
-            for i in range(4,excel.shape[1]):
+
+            for i in range(3,excel.shape[1]):
+                #print(i)
                 year = excel.iloc[k, i]
-                if year == ".":
+                #print(year)
+                if year == "." or pd.isnull(year):
                     continue
                 year = str(int(year))
                 f.write(reg + " " + var + " " + year + '\n')
     f.close()
 #dst_list_creator(dst_load_path,save_path)
 
-reg = "aefv"
+reg = "aefb"
 def create_var_list(reg,list_load_path,save_path):
     #Todo første række i excel 4276 er ikke med
     reg = reg.upper()
     file_dst = open(list_load_path + "dst_out.txt", "r")
     file_4276 = open(list_load_path + "out_allsheets.txt", "r")
 
-    temp = open(list_load_path + "temp.txt","w")
+    temp_dst = open(list_load_path + "temp_dst.txt","w")
     for line in file_dst:
         if line.startswith(reg):
-            temp.write(line)
-    temp.close()
-    temp = open(list_load_path + "temp.txt", "r")
-    file_match = set(file_4276).intersection(temp)
+            temp_dst.write(line)
+    temp_dst.close()
+
+    temp_4276 = open(list_load_path + "temp_4276.txt", "w")
+    for line in file_4276:
+
+        if line.startswith(reg):
+            temp_4276.write(line)
+    temp_4276.close()
+
+    temp_dst = open(list_load_path + "temp_dst.txt", "r")
+    temp_4276 = open(list_load_path + "temp_4276.txt", "r")
+
+    file_match = set(temp_4276).intersection(temp_dst)
+
+
     with open(list_load_path + 'result.txt', 'w') as file_out:
-        for line in file_match:
+        for line in sorted(file_match):
             file_out.write(line)
     file_out.close()
+    temp_dst.close()
+    file_out.close()
 
-    # open register from DST
+    temp_dst = open(list_load_path + "temp_dst.txt", "r")
+    workbook = xlsxwriter.Workbook(save_path + 'demo.xlsx')
+    worksheet = workbook.add_worksheet(reg)
+    dst_format = workbook.add_format()
+    dst_format.set_bg_color('red')
+    ivoe_format = workbook.add_format()
+    ivoe_format.set_bg_color('yellow')
+    prev_line = ""
+    row = 1
+    lowest = 10000
 
-    #recolor according to result
+    for line in temp_dst:
+        if lowest > int(line.split(" ")[2]):
+            lowest = int(line.split(" ")[2])
+    temp_dst = open(list_load_path + "temp_dst.txt", "r")
+    for line in temp_dst:
+        if prev_line == line.split(" ")[1]:
+            col = int(line.split(" ")[2]) - lowest + 1
+            worksheet.write(row, col, line.split(" ")[2], dst_format)
+        else:
+            col = int(line.split(" ")[2]) - lowest + 1
+            row = row + 1
+            worksheet.write(row, 0, line.split(" ")[1], dst_format)
+            worksheet.write(row, col, line.split(" ")[2], dst_format)
 
-    #create list of var names and years from excel file
 
-    #loop through result and get index in the lists of each var and year. recolor that field.
+        prev_line = line.split(" ")[1]
+    temp_dst.close()
+    match = open(list_load_path + 'result.txt')
+    prev_line = ""
+    row = 1
+    for line in match:
+        if prev_line == line.split(" ")[1]:
+            col = int(line.split(" ")[2]) - lowest + 1
+            worksheet.write(row, col, line.split(" ")[2], ivoe_format)
+        else:
+            col = int(line.split(" ")[2]) - lowest + 1
+            row = row + 1
+            worksheet.write(row, col, line.split(" ")[2], ivoe_format)
+        prev_line = line.split(" ")[1]
 
-    #save register
-
-
-    #which input should the script take: format: reg: var(year-year), var(year-year)... \n reg: var...
-
+        prev_line = line.split(" ")[1]
+    workbook.close()
 
 
 
-
-    k = True
-
-    if False == k:
-        workbook = xlsxwriter.Workbook(save_path + 'demo.xlsx')
-        worksheet = workbook.add_worksheet()
-        dst_format = workbook.add_format()
-
-        dst_format.set_bg_color('yellow')
-        worksheet.write(2, 0, 123,dst_format)
-
-        workbook.close()
 create_var_list(reg,list_load_path,save_path)
-
-    #change name -2
-    # change DRGPSYK_AMB2,DRGSOMA_AMB2,DRGSOMA_HEL2, lpradm,lprbes,lprdiag,
-    #lprfoeds -> lprfoedsler, lprsksop --> lprsksopr, lprsksub --> lprssksube, lprudtil, lprudtilsgh,

@@ -8,16 +8,15 @@ import csv
 import urllib
 
 url = 'https://www.dst.dk/da/TilSalg/Forskningsservice/Data/Register_Variabeloversigter'
-
 response = get(url)
-
-
-
-
 soup = BeautifulSoup(response.content, "lxml")
 
-path = "C:/Users/mikkel-bj/Desktop/datamanager/script/from_dst/"
-#path = "D:/datamanager/script/from_dst/"
+arbejde = 0
+
+if arbejde == 1:
+    path = "C:/Users/mikkel-bj/Desktop/datamanager/script/from_dst/"
+else:
+    path = "C:\\Users\\Mikkel\Desktop\\arbejde\\Project database\\datamanager\\script\\from_dst\\"
 def crawler(path):
 
     for a in soup.find_all('a', href=True):
@@ -51,7 +50,7 @@ def crawler(path):
                 dfs = pd.read_html(url2)
                 dfs = dfs[0]
                 dfs.to_excel(path + name + "2.xlsx")
-            except (urllib.error.HTTPError, IndexError):
+            except (urllib.error.HTTPError, IndexError,ValueError):
                 print("error")
 
 
