@@ -8,10 +8,10 @@ import pickle
 #make sure path is to most recent version!!
 
 
-arbejde = 0
+arbejde = 1
 
 if arbejde == 1:
-    save_path = 'C:\\Users\\mikkel-bj\\Desktop\\datamanager\\script\\variable_lists\\'
+    save_path = 'C:\\Users\\mikkel-bj\\Desktop\\datamanager\\script\\'
     load_path = 'C:\\Users\\mikkel-bj\\Desktop\\datamanager\\sharepoint_backup\\704276_Opdateringsoversigt30082018_newname.xlsx'
     dst_load_path = "C:\\Users\\mikkel-bj\\Desktop\\datamanager\\script\\from_dst\\"
     list_load_path = "C:\\Users\\mikkel-bj\\Desktop\\datamanager\\script\\"
@@ -26,7 +26,7 @@ def create_register_list(save_path,load_path):
     f = open(save_path + "out.txt", "w+")
     Register_list = dict_4276['Oversigt']["Unnamed: 1"]
     for reg in Register_list:
-
+        print(reg)
         try:
             if math.isnan(reg):
                 continue
@@ -40,7 +40,6 @@ def create_register_list(save_path,load_path):
         num_rows = register_lookup.shape[0]
 
         num_cols = register_lookup.shape[1]
-        var_list = register_lookup['Dataset='+reg]
 
         for row in range(0,num_rows):
             var = register_lookup.iloc[row]['Dataset='+reg]
@@ -54,8 +53,14 @@ def create_register_list(save_path,load_path):
                 continue
             for col in range(1,num_cols):
 
-                # print("Unnamed: " + str(col))
-                year = register_lookup.iloc[row]['Unnamed: ' + str(col)]
+                try:
+                    year = register_lookup.iloc[row]['Unnamed: ' + str(col)]
+                except:
+                    print(year)
+                    print(type(year))
+                    continue
+                if row == 4: #correct issues with a double row thats always present here.
+                    year = register_lookup.iloc[row-1]['Unnamed: ' + str(col)]
                 try:
                     if math.isnan(year):
                         continue
@@ -69,10 +74,6 @@ def create_register_list(save_path,load_path):
                 year = str(year)
                 with open(save_path + 'out.txt', 'a') as the_file:
                     the_file.write(reg + " " + var + " " + year + '\n')
-                # float to int
-
-        # with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-        #     print(register_lookup)
 
     f.close()
 #create_register_list(save_path,load_path)
@@ -126,7 +127,6 @@ def dst_list_creator(load_path,save_path):
             for i in range(3,excel.shape[1]):
                 #print(i)
                 year = excel.iloc[k, i]
-                #print(year)
                 if year == "." or pd.isnull(year):
                     continue
                 year = str(int(year))
@@ -139,7 +139,7 @@ def create_var_list(reg,list_load_path,save_path):
     #Todo første række i excel 4276 er ikke med
     reg = reg.upper()
     file_dst = open(list_load_path + "dst_out.txt", "r")
-    file_4276 = open(list_load_path + "out_allsheets.txt", "r")
+    file_4276 = open(list_load_path + "out.txt", "r")
 
     temp_dst = open(list_load_path + "temp_dst.txt","w")
     for line in file_dst:
@@ -213,4 +213,4 @@ def create_var_list(reg,list_load_path,save_path):
 
 
 
-create_var_list(reg,list_load_path,save_path)
+#create_var_list(reg,list_load_path,save_path)
