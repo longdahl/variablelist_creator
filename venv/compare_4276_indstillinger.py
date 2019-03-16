@@ -8,7 +8,7 @@ import pickle
 #make sure path is to most recent version!!
 
 
-arbejde = 1
+arbejde = 0
 
 if arbejde == 1:
     save_path = 'C:\\Users\\mikkel-bj\\Desktop\\datamanager\\script\\'
@@ -17,6 +17,7 @@ if arbejde == 1:
     list_load_path = "C:\\Users\\mikkel-bj\\Desktop\\datamanager\\script\\"
 else:
     save_path = "C:\\Users\\Mikkel\Desktop\\arbejde\\Project database\\datamanager\\script\\variable_lists\\"
+    load_path = "C:\\Users\\Mikkel\Desktop\\arbejde\\Project database\\datamanager\\sharepoint_backup\\704276_Opdateringsoversigt30082018.xlsx"
     dst_load_path = "C:\\Users\\Mikkel\Desktop\\arbejde\\Project database\\datamanager\\script\\from_dst\\"
     list_load_path = "C:\\Users\\Mikkel\Desktop\\arbejde\\Project database\\datamanager\\script\\"
 def create_register_list(save_path,load_path):
@@ -76,7 +77,7 @@ def create_register_list(save_path,load_path):
                     the_file.write(reg + " " + var + " " + year + '\n')
 
     f.close()
-#create_register_list(save_path,load_path)
+create_register_list(save_path,load_path)
 
 
 def renamer(load_path):
