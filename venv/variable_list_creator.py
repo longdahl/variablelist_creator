@@ -1,18 +1,16 @@
-import pandas as pd
-import math
 import os
 import xlsxwriter
-import numpy as np
-import pickle
-import tkinter
 
-arbejde = 0
+
+arbejde = 1
 if arbejde == 1:
     save_path = 'C:\\Users\\mikkel-bj\\Desktop\\datamanager\\script\\variable_lists\\'
+    input_list = "C:\\Users\\mikkel-bj\\Desktop\\datamanager\\script\\var_list_input"
     load_path = 'C:\\Users\\mikkel-bj\\Desktop\\datamanager\\sharepoint_backup\\704276_Opdateringsoversigt30082018_newname.xlsx'
     dst_load_path = "C:\\Users\\mikkel-bj\\Desktop\\datamanager\\script\\from_dst\\"
     list_load_path = "C:\\Users\\mikkel-bj\\Desktop\\datamanager\\script\\"
 else:
+    input_list = "C:\\Users\\Mikkel\\Desktop\\arbejde\\Project database\\datamanager\\script\\var_list_input"
     save_path = "C:\\Users\\Mikkel\Desktop\\arbejde\\Project database\\datamanager\\script\\variable_lists\\"
     dst_load_path = "C:\\Users\\Mikkel\Desktop\\arbejde\\Project database\\datamanager\\script\\from_dst\\"
     list_load_path = "C:\\Users\\Mikkel\Desktop\\arbejde\\Project database\\datamanager\\script\\"
@@ -37,19 +35,15 @@ def create_var_list(filename,reg_list,list_load_path,save_path):
             reg = reg.rstrip("\n\r")
             file_dst = open(list_load_path + "dst_out.txt", "r")
             file_4276 = open(list_load_path + "var4276.txt", "r")
-
-            # temp_dst = open(list_load_path + "temp_dst.txt", "w")
-            # for line in file_dst:
-            #    if line.startswith(reg):
-            #        temp_dst.write(line)
-            # temp_dst.close()
             temp_dst = []
+
             for line in file_dst:
 
                 if line.startswith(reg):
                     line = line.upper()
                     line = var_name_fixer(line)
                     temp_dst.append(line)
+
             temp_4276 = []
 
             for line in file_4276:
@@ -60,32 +54,12 @@ def create_var_list(filename,reg_list,list_load_path,save_path):
                     temp_4276.append(line)
 
 
-                #print(temp_dst)
-            # temp_4276 = open(list_load_path + "temp_4276.txt", "w")
-            # for line in file_4276:
-
-            #    if line.startswith(reg):
-            #        temp_4276.write(line)
-            # temp_4276.close()
-            # temp_dst = open(list_load_path + "temp_dst.txt", "r")
-            # temp_4276 = open(list_load_path + "temp_4276.txt", "r")
-
             file_match = [value[:-1] for value in temp_dst if value in temp_4276]
             file_match = sorted(file_match)
 
             if reg == "DODSAASG":
                 for line in file_match:
                     print(line)
-            # file_match = set(temp_4276).intersection(temp_dst)
-            # temp_4276.close()
-            # os.remove(temp_4276.name)
-            # with open(list_load_path + 'result.txt', 'w') as file_out:
-            #    for line in sorted(file_match):
-            #file_out.write(line)
-            # file_out.close()
-            # temp_dst.close()
-
-            # temp_dst = open(list_load_path + "temp_dst.txt", "r")
 
             worksheet = workbook.add_worksheet(reg)
             dst_format = workbook.add_format()
@@ -99,12 +73,13 @@ def create_var_list(filename,reg_list,list_load_path,save_path):
             for line in temp_dst:
                 if lowest > int(line.split(" ")[2]):
                     lowest = int(line.split(" ")[2])
-            # temp_dst = open(list_load_path + "temp_dst.txt", "r")
+
             worksheet.write(0, 0, reg)
             worksheet.write(1, 0, "Variable name")
             worksheet.write(0, 1, "IVØ leverance", ivoe_format)
             worksheet.write(0, 2, "DST leverance", dst_format)
             var_list = []
+
             for line in temp_dst:
                 if prev_line == line.split(" ")[1]:
                     col = int(line.split(" ")[2]) - lowest + 1
@@ -117,27 +92,20 @@ def create_var_list(filename,reg_list,list_load_path,save_path):
                     worksheet.write(row, col, line.split(" ")[2], dst_format)
                 prev_line = line.split(" ")[1]
 
-            # temp_dst.close()
-            # os.remove(temp_dst.name)
-
-            # match = open(list_load_path + 'result.txt')
             for line in file_match:
                 row = var_list.index(line.split(" ")[1]) + 2
                 col = int(line.split(" ")[2]) - lowest + 1
                 worksheet.write(row, col, line.split(" ")[2], ivoe_format)
 
-                # match.close()
-                # os.remove(match.name)
         except:
             print("there was an error with register: " + reg)
     workbook.close()
 
 if __name__ == '__main__':
-    directory = "C:\\Users\\Mikkel\\Desktop\\arbejde\\Project database\\datamanager\\script\\var_list_input"
-    for filename in os.listdir(directory):
 
+    for filename in os.listdir(input_list):
         reg_list = []
-        for line in open(directory + "\\" + filename):
+        for line in open(input_list + "\\" + filename):
             reg_list.append(line)
         create_var_list(filename,reg_list,list_load_path,save_path)
 
