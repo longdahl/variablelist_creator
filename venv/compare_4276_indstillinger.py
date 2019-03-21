@@ -8,7 +8,7 @@ import pickle
 #make sure path is to most recent version!!
 
 
-arbejde = 0
+arbejde = 1
 
 if arbejde == 1:
     save_path = 'C:\\Users\\mikkel-bj\\Desktop\\datamanager\\script\\'
@@ -77,7 +77,7 @@ def create_register_list(save_path,load_path):
                     the_file.write(reg + " " + var + " " + year + '\n')
 
     f.close()
-create_register_list(save_path,load_path)
+#create_register_list(save_path,load_path)
 
 
 def renamer(load_path):
@@ -116,24 +116,30 @@ def dst_list_creator(load_path,save_path):
         excel = pd.read_excel(load_path+file)
 
         #temp = pickle.loads(pickle.dumps(excel.iloc[2,3::])) hacky deep copy
+        times_index = 1
 
+        for i in range(0,excel.shape[1]):
+            if (excel.iloc[2,i]) == "TIMES":
+                times_index = i
+                break
 
-        excel.to_excel(load_path + file)
         reg = file[0:-5]
         print(reg)
-        for k in range(2,excel.shape[0]):
-            #print(k)
-            var = excel.iloc[k,1]
+        for k in range(3,excel.shape[0]):
+            var = excel.iloc[k,times_index]
 
-            for i in range(3,excel.shape[1]):
-                #print(i)
+            label = excel.iloc[k,times_index +2]
+            label = label.replace(" ", "_")
+            print(var,label)
+            for i in range(times_index+3,excel.shape[1]):
                 year = excel.iloc[k, i]
+                print(year)
                 if year == "." or pd.isnull(year):
                     continue
                 year = str(int(year))
-                f.write(reg + " " + var + " " + year + '\n')
+                f.write(reg + " " + var + " " + label + " " + year + '\n')
     f.close()
-#dst_list_creator(dst_load_path,save_path)
+dst_list_creator(dst_load_path,save_path)
 
 reg = "aefb"
 def create_var_list(reg,list_load_path,save_path):

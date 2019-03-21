@@ -11,7 +11,7 @@ url = 'https://www.dst.dk/da/TilSalg/Forskningsservice/Data/Register_Variabelove
 response = get(url)
 soup = BeautifulSoup(response.content, "lxml")
 
-arbejde = 0
+arbejde = 1
 
 if arbejde == 1:
     path = "C:/Users/mikkel-bj/Desktop/datamanager/script/from_dst/"
@@ -30,6 +30,13 @@ def crawler(path):
             name = a['href']
             name = name[total::]
             name = name.split(' -')[0]
+
+            #code to update a specific register:
+            #if name != "AKAS":
+            #    print("not this" + name)
+            #    continue
+
+
             #name = a['href'][total:total+4]
             #name = name.replace(" ","")
             #name = name.replace("-", "")
